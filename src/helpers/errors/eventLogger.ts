@@ -8,7 +8,7 @@ export const logInfo = winston.createLogger({
   ),
   transports: [
     new winston.transports.File({ filename: "./logs/info.log" }),
-    // new winston.transports.Console({ level: "error" }),
+    new winston.transports.Console({ level: "error" }),
   ],
 });
 
@@ -20,6 +20,6 @@ export const logError = winston.createLogger({
   ),
   transports: [
     new winston.transports.File({ filename: "./logs/error.log", level: "warn" }),
-    // new winston.transports.Console({ level: "warn" }),
+    new winston.transports.Console({ level: "warn" }),
   ],
 });
