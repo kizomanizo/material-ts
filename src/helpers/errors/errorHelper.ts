@@ -15,11 +15,6 @@ export default class ErrorHandler {
     logError.error(err.stack || err.message);
 
     // Send the error response as JSON
-    logInfo.info(
-      `${new Date()}- Info ( ${
-        err.statusCode
-      }): An error was thrown and logged in the error logger.`
-    );
     res.status(statusCode).json({
       success: false,
       status: statusCode,

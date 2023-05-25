@@ -6,14 +6,14 @@ const port = process.env.PORT || 3001;
 import cors from "cors";
 import ErrorHandler from "./helpers/errors/errorHelper";
 import { Request, Response, NextFunction } from "express";
-import { Router } from "./routes/userRoutes";
+import userRouter from "./routes/userRoutes";
 import { ApiError } from "./helpers/errors/apiError";
 
 // App Configuration Entries
 app.disable("x-powered-by");
 app.use(cors({ exposedHeaders: ["x-auth-token"] }));
 app.use(Express.urlencoded({ extended: false }));
-app.use("/api/v1/users", Router);
+app.use("/api/v1/users", userRouter);
 
 // Start the server
 app.listen(port, () => {
