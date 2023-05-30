@@ -19,7 +19,10 @@ export const logError = winston.createLogger({
     winston.format.json()
   ),
   transports: [
-    new winston.transports.File({ filename: "./logs/error.log", level: "warn" }),
+    new winston.transports.File({
+      filename: "./logs/error.log",
+      level: "warn",
+    }),
     // new winston.transports.Console({ level: "warn" }),
   ],
 });

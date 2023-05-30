@@ -1,0 +1,228 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "mysql"
+  url      = env("DATABASE_URL")
+}
+
+model Person {
+  uuid        String    @unique @default(uuid())
+  firstName   String    @db.VarChar(50)
+  middleName  String?   @db.VarChar(50)
+  lastName    String    @db.VarChar(50)
+  address     String?
+  mobilePhone String?
+  birthDate   DateTime?
+  isActive    Boolean   @default(true)
+  createdAt   DateTime  @default(now())
+  updatedAt   DateTime?
+  createdBy   String?
+  User        User[]
+  Client      Client[]
+
+  @@map("person")
+}
+
+model Role {
+  uuid      String    @unique @default(uuid())
+  name      String    @unique @db.VarChar(30)
+  access    String
+  isActive  Boolean   @default(true)
+  createdAt DateTime  @default(now())
+  updatedAt DateTime?
+  createdBy String?
+  User      User[]
+
+  @@map("user_role")
+}
+
+model Client {
+  uuid         String    @unique @default(uuid())
+  lastPurchase DateTime?
+  clientRating Int
+  isActive     Boolean   @default(true)
+  createdAt    DateTime  @default(now())
+  updatedAt    DateTime?
+  Order        Order[]
+  Person       Person?   @relation(fields: [personId], references: [uuid])
+  personId     String?
+  createdBy    String?
+
+  @@map("client")
+}
+
+model User {
+  uuid         String    @unique @default(uuid())
+  email        String    @unique @db.VarChar(50)
+  passwordHash String
+  joinDate     DateTime  @default(now())
+  lastLogin    DateTime?
+  isActive     Boolean   @default(true)
+  createdAt    DateTime  @default(now())
+  updatedAt    DateTime?
+  personId     String?
+  Person       Person?   @relation(fields: [personId], references: [uuid])
+  Role         Role?     @relation(fields: [roleId], references: [uuid])
+  roleId       String?
+  createdBy    String?
+
+  @@map("user")
+}
+
+model Category {
+  uuid      String    @unique @default(uuid())
+  name      String    @unique @db.VarChar(30)
+  access    String
+  isActive  Boolean   @default(true)
+  createdAt DateTime  @default(now())
+  updatedAt DateTime?
+  createdBy String?
+  Item      Item[]
+
+  @@map("item_category")
+}
+
+model Supplier {
+  uuid         String    @unique @default(uuid())
+  name         String    @unique @db.VarChar(30)
+  address      String?
+  mobilePhone  String    @db.VarChar(20)
+  email        String    @db.VarChar(30)
+  reorderLevel Int
+  maximumLevel Int
+  batchNumber  String?
+  isActive     Boolean   @default(true)
+  createdAt    DateTime  @default(now())
+  updatedAt    DateTime?
+  createdBy    String?
+  Item         Item[]
+
+  @@map("item_supplier")
+}
+
+model Store {
+  uuid      String    @unique @default(uuid())
+  name      String    @unique @db.VarChar(30)
+  isActive  Boolean   @default(true)
+  createdAt DateTime  @default(now())
+  updatedAt DateTime?
+  createdBy String?
+  Item      Item[]
+
+  @@map("item_store")
+}
+
+model Item {
+  uuid         String      @unique @default(uuid())
+  name         String      @unique @db.VarChar(30)
+  buyingPrice  Int
+  sellingPrice Int
+  unit         String
+  reorderLevel Int
+  maximumLevel Int
+  batchNumber  String?
+  isActive     Boolean     @default(true)
+  createdAt    DateTime    @default(now())
+  updatedAt    DateTime?
+  OrderItem    OrderItem[]
+  Inventory    Inventory[]
+  Stock        Stock[]
+  Category     Category?   @relation(fields: [categoryId], references: [uuid])
+  categoryId   String?
+  Supplier     Supplier?   @relation(fields: [supplierId], references: [uuid])
+  supplierId   String?
+  Store        Store?      @relation(fields: [storeId], references: [uuid])
+  storeId      String?
+  createdBy    String?
+
+  @@map("item")
+}
+
+model Insurance {
+  uuid        String    @unique @default(uuid())
+  name        String    @unique @db.VarChar(30)
+  description String
+  isActive    Boolean   @default(true)
+  createdAt   DateTime  @default(now())
+  updatedAt   DateTime?
+  useruuid    String?
+  createdBy   String?
+
+  @@map("insurance")
+}
+
+model Order {
+  uuid            String    @unique @default(uuid())
+  orderDate       DateTime
+  isInsured       Boolean
+  insuranceNumber String
+  isActive        Boolean   @default(true)
+  createdAt       DateTime  @default(now())
+  updatedAt       DateTime?
+  clientId        String?
+  Client          Client?   @relation(fields: [clientId], references: [uuid])
+
+  @@map("order")
+}
+
+model Discount {
+  uuid         String      @unique @default(uuid())
+  name         String      @unique @db.VarChar(30)
+  discountRate Int
+  startDate    DateTime
+  endDate      DateTime
+  isActive     Boolean     @default(true)
+  createdAt    DateTime    @default(now())
+  updatedAt    DateTime?
+  OrderItem    OrderItem[]
+  createdBy    String?
+
+  @@map("order_discount")
+}
+
+model OrderItem {
+  uuid       String    @unique @default(uuid())
+  pauuid     Int
+  quantity   Int
+  isActive   Boolean   @default(true)
+  createdAt  DateTime  @default(now())
+  updatedAt  DateTime?
+  Item       Item?     @relation(fields: [itemId], references: [uuid])
+  itemId     String?
+  Discount   Discount? @relation(fields: [discountId], references: [uuid])
+  discountId String?
+
+  @@map("order_item")
+}
+
+model Inventory {
+  uuid      String    @unique @default(uuid())
+  quantity  Int
+  isActive  Boolean   @default(true)
+  createdAt DateTime  @default(now())
+  updatedAt DateTime?
+  Item      Item?     @relation(fields: [itemId], references: [uuid])
+  itemId    String?
+  createdBy String?
+
+  @@map("item_inventory")
+}
+
+model Stock {
+  uuid      String    @unique @default(uuid())
+  stockDate DateTime? @default(now())
+  quantity  Int
+  isActive  Boolean   @default(true)
+  createdAt DateTime  @default(now())
+  updatedAt DateTime?
+  Item      Item?     @relation(fields: [itemId], references: [uuid])
+  itemId    String?
+  createdBy String?
+
+  @@map("item_stock")
+}

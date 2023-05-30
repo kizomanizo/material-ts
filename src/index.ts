@@ -4,31 +4,42 @@ const Express = require("express");
 const app = Express();
 const port = process.env.PORT || 3001;
 import cors from "cors";
-import ErrorHandler from "./helpers/errors/errorHelper";
 import { Request, Response, NextFunction } from "express";
+import * as ErrorHandlers from "./helpers/errors/apiError";
+import bodyParser from "body-parser";
 import userRouter from "./routes/userRoutes";
-import { ApiError } from "./helpers/errors/apiError";
+import roleRouter from "./routes/roleRoutes";
 
 // App Configuration Entries
 app.disable("x-powered-by");
 app.use(cors({ exposedHeaders: ["x-auth-token"] }));
-app.use(Express.urlencoded({ extended: false }));
+app.use(Express.urlencoded({ extended: true }));
+app.use(bodyParser.json());
 app.use("/api/v1/users", userRouter);
+app.use("/api/v1/roles", roleRouter);
 
 // Start the server
 app.listen(port, () => {
   console.log("INFO: App started and listening on port " + port);
 });
 
-// Catch-all route handler for unknown routes
-app.use((req: Request, res: Response, next: NextFunction) => {
-  const error = new ApiError(404, "Not Found");
+// Error handling middleware
+app.use((error: any, req: Request, res: Response, next: NextFunction) => {
+  ErrorHandlers.clientErrors(error, req, res, next);
   next(error);
 });
 
-// Error handling middleware
-app.use((err: any, req: Request, res: Response, next: NextFunction) => {
-  ErrorHandler.handleError(err, req, res, next);
+app.use((error: any, req: Request, res: Response, next: NextFunction) => {
+  ErrorHandlers.allErrors(error, req, res, next);
+  next(error);
 });
 
+app.use((req: Request, res: Response, next: NextFunction) => {
+  res.status(404).json({
+    success: false,
+    status: 404,
+    request: req.path,
+    message: "Route requested is not available",
+  });
+});
 module.exports = app;

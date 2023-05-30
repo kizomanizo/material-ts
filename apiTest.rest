@@ -4,8 +4,18 @@
 # @authToken = {{login.response.body.message}}
 @addeduserId = {{create.response.body.message.id}}
 
-### Random
-GET http://localhost:4003
+### Get Roles
+GET {{baseUrl}}/roles
+
+### Create Role
+POST {{baseUrl}}/roles HTTP/1.1
+Content-Type: application/json
+
+{
+    "name": "Hacker",
+    "access": "0",
+    "createdBy": "a62297e2-096d-4a89-89d2-8289a85d9ee6"
+}
 
 ### Get all users
 GET {{baseUrl}}/users HTTP/1.1
@@ -26,4 +36,16 @@ Content-Type: application/json
     "email": "{{int}}@example.com",
     "level_id": "{{levels.response.body.message[0].id}}",
     "status": true
+}
+
+
+{
+    "Person": {
+        "firstName": "Admin",
+        "middleName": "Sample",
+        "lastName": "Person",
+        "address": "1243 Sinza-A, Dar es Salaam",
+        "mobilePhone": "0754100001",
+        "birthDate": "1980-01-01"
+    }
 }
